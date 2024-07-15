@@ -1,0 +1,45 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Ratio(nn.Module):
+    """
+    Simple MLP classifier for the ratio p/q.
+
+    Args:
+        h_dim (int): hidden dimension
+        in_dim (int): input dimension
+        h_layers (int): number of hidden layers
+        activation_fn (function): activation function, eg torch.nn.functional.gelu
+
+    """
+    def __init__(self, h_dim=100, in_dim=2, h_layers=4):
+        super(Ratio, self).__init__()
+
+        self.h_dim = h_dim
+        self.in_dim = in_dim
+        self.h_layers = h_layers
+        
+
+        self.fc_in = nn.Linear(self.in_dim, self.h_dim)
+        self.fc_hidden = nn.Linear(self.h_dim, self.h_dim)
+        self.fc_out = nn.Linear(self.h_dim, 1)
+
+    def forward(self, x):
+        '''
+        Returns p/q, a positive scalar. Computed as exp(NN) where NN is the output of a MLP classifier.
+        '''
+
+        x = F.relu(self.fc_in(x)) 
+
+        for l in range(self.h_layers):
+            x = F.relu(self.fc_hidden(x)) + x
+
+        logits = self.fc_out(x).exp()
+
+        return logits
+    
+def loss_nce(r_p, r_q,p_size, q_size):
+    v = q_size / p_size
+    return (-(r_p /(v+r_p)).log()).mean() - v* ((v/(v+r_q)).log().mean()) 
