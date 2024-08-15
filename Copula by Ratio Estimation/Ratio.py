@@ -14,13 +14,15 @@ class Ratio(nn.Module):
         activation_fn (function): activation function, eg torch.nn.functional.gelu
 
     """
-    def __init__(self, h_dim=100, in_dim=2, h_layers=4):
+    def __init__(self, h_dim=100, in_dim=2, h_layers=4, normalising_cst = False, c = 1.0):
         super(Ratio, self).__init__()
 
         self.h_dim = h_dim
         self.in_dim = in_dim
         self.h_layers = h_layers
-        
+        self.normalising_cst = normalising_cst
+        if self.normalising_cst:
+            self.c = nn.Parameter(torch.tensor(c))
 
         self.fc_in = nn.Linear(self.in_dim, self.h_dim)
         self.fc_hidden = nn.Linear(self.h_dim, self.h_dim)
@@ -37,6 +39,9 @@ class Ratio(nn.Module):
             x = F.relu(self.fc_hidden(x)) + x
 
         logits = self.fc_out(x).exp()
+
+        if self.normalising_cst:
+            logits = logits * self.c
 
         return logits
     
