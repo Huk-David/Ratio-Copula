@@ -11,10 +11,8 @@ class Ratio(nn.Module):
         h_dim (int): hidden dimension
         in_dim (int): input dimension
         h_layers (int): number of hidden layers
-        activation_fn (function): activation function, eg torch.nn.functional.gelu
-
     """
-    def __init__(self, h_dim=100, in_dim=2, h_layers=4, normalising_cst = False, c = 1.0):
+    def __init__(self, h_dim=100, in_dim=2, h_layers=2, normalising_cst = False, c = 1.0):
         super(Ratio, self).__init__()
 
         self.h_dim = h_dim
@@ -48,3 +46,13 @@ class Ratio(nn.Module):
 def loss_nce(r_p, r_q,p_size, q_size):
     v = q_size / p_size
     return (-(r_p /(v+r_p)).log()).mean() - v* ((v/(v+r_q)).log().mean()) 
+
+class LogisticRegression(torch.nn.Module):    
+    # build the constructor
+    def __init__(self, n_inputs, n_outputs):
+        super(LogisticRegression, self).__init__()
+        self.linear = torch.nn.Linear(n_inputs, n_outputs)
+    # make predictions
+    def forward(self, x):
+        y_pred = torch.sigmoid(self.linear(x))
+        return y_pred
