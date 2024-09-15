@@ -53,3 +53,7 @@ for r, run in (enumerate(sims_runs_all)):
         joblib.dump(ratio[0][0], model_path)  # Save the logistic regression model
         joblib.dump(ratio[0][1], poly_path)   # Save the polynomial feature transformer
         print('run', r, 'cop_u', u, 'DONE')
+
+# Save the L_ratios_all
+with open('L_ratios_all_25_runs_4copulas_2Dexperiment.pkl', 'wb') as f:
+    pickle.dump(np.array(L_ratios_all), f)
