@@ -227,3 +227,56 @@ def plot_log_ratio_logistic(model, poly, z_cop, z_indep, use_cdf=False, times_ga
 #model, poly = train_poly_classifier(z_cop, z_indep, degree=2)
 #plot_log_ratio_logistic(model, poly, z_cop, z_indep, use_cdf=False, times_gauss=False, Ratio_prob=False, include_data=False,title='Class Probability')
 #plt.show()
+
+
+def W_L_ratio_fit(z_cop,z_indep,waymarks=5,degrees=2):
+    ''' 
+    Waymarked logistic ratio copula fit. Fits a logistic classifier for each waymark to classify between the copula and independent data.
+
+    Args:
+        z_cop: The copula data. (n, dim)
+        z_indep: The independent data. (n, dim)
+        waymarks: The number of waymarks to fit classifiers for. (scalar)
+        degrees: The degree of the polynomial expansion including interactions. (scalar)
+
+    Returns:
+        A list of tuples containing the logistic classifiers and polynomial feature transformers for each waymark. [[model,poly],...]
+    '''
+
+    alphas = np.linspace(0, 1, waymarks)
+    ratios_logistic = []
+    for i in tqdm(range(waymarks - 1)):
+        alpha_i = alphas[i]
+        alpha_i1 = alphas[i + 1]
+        w_i = waymark(z_cop, z_indep, torch.tensor(alpha_i))
+        w_i1 = waymark(z_cop, z_indep, torch.tensor(alpha_i1))
+        model, poly = train_poly_classifier(w_i, w_i1, degree=degrees)
+        ratios_logistic.append([model, poly])
+
+    return ratios_logistic
+
+def L_W_ratio_compute(logistic_ratios,x,log_pdf=True):
+    ''' 
+    Compute the ratio copula for a given input x using telescoping logistic classifiers.
+
+    Args:
+        logistic_ratios: A list of tuples containing the logistic classifiers and polynomial feature transformers.
+        x: The input data.
+        log_pdf: Boolean flag to return the log of the ratio copula.
+    
+    Returns:
+        The ratio copula (log)pdf for the input x.
+    '''
+    out = 0
+    for ratio in logistic_ratios:
+        model, poly = ratio
+        x_poly = poly.transform(x)
+        proba = np.clip(model.predict_proba(x_poly)[:, 1], 1e-5, 1 - 1e-5)
+        prob_ratio = np.log(proba) - np.log(1 - proba)
+        out += prob_ratio
+    if not log_pdf:
+        out = np.exp(out)
+    return out
+
+
+#L_W_ratio_compute(ratios_logistic, z_cop_samples[1].reshape(1,-1),log_pdf=False)

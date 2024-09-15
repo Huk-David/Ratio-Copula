@@ -47,12 +47,3 @@ def loss_nce(r_p, r_q,p_size, q_size):
     v = q_size / p_size
     return (-(r_p /(v+r_p)).log()).mean() - v* ((v/(v+r_q)).log().mean()) 
 
-class LogisticRegression(torch.nn.Module):    
-    # build the constructor
-    def __init__(self, n_inputs, n_outputs):
-        super(LogisticRegression, self).__init__()
-        self.linear = torch.nn.Linear(n_inputs, n_outputs)
-    # make predictions
-    def forward(self, x):
-        y_pred = torch.sigmoid(self.linear(x))
-        return y_pred

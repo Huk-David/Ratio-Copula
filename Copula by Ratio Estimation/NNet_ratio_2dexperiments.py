@@ -1,13 +1,10 @@
-print('here0')
 import numpy as np
 import pickle
 from Ratio import *
 import os
-from tqdm import tqdm
 import scipy.stats as scs
 
 
-print('here1')
 # load sims_runs_all from a pkl file
 with open('simulated_data_25_runs_4copulas_2Dexperiment.pkl', 'rb') as f:
     sims_runs_all = pickle.load(f)
@@ -22,14 +19,12 @@ N_TEST = 5000
 np.random.seed(990109)
 torch.manual_seed(990109)
 
-print('here2')
 
 # Create a directory to save the model parameters
 os.makedirs('model_parameters_NNet_ratio_25_runs_4copulas_2Dexperiment', exist_ok=True)
 
-print('here3')
 
-for r,run in tqdm(enumerate(sims_runs_all)):
+for r,run in (enumerate(sims_runs_all)):
     # run = [u1_student, u2_student], [u1_clayton, u2_clayton], [u1_gumbel, u2_gumbel],[ u_1_mix, u_2_mix]
     for u,u1_u2 in enumerate(run):
         # u1_u2 = [u1, u2]
@@ -70,7 +65,7 @@ for r,run in tqdm(enumerate(sims_runs_all)):
         p_data_test = np.nan_to_num(p_data_test, nan=0, posinf=6., neginf=-6.)
         r_test = ratio(torch.tensor(p_data_test).float())
         print('run',r,'cop_u',u,'DONE',(r_test).log().sum().detach().numpy())
-        r_log = np.log(r_test.detach().numpy()).sum() 
+        #r_log = np.log(r_test.detach().numpy()).sum() 
         ratio_ll.append((r_test).log().sum().detach().numpy())
         ratios.append(ratio)
 
@@ -78,10 +73,9 @@ for r,run in tqdm(enumerate(sims_runs_all)):
         model_path = f'model_parameters_NNet_ratio_25_runs_4copulas_2Dexperiment/NNet_ratio_run_{r}_cop_u_{u}.pt'
         torch.save(ratio.state_dict(), model_path)
 
-        print('run',r,'cop_u',u,'DONE',r_log)
+        #print('run',r,'cop_u',u,'DONE',r_log)
 
 # save ratio_ll as a pkl
 with open('ratio_ll_25_runs_4copulas_2Dexperiment.pkl', 'wb') as f:
     pickle.dump(np.array(ratio_ll), f)
 
-print('DONE')
