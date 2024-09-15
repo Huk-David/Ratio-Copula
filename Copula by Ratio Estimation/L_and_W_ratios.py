@@ -6,7 +6,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import PolynomialFeatures
 import matplotlib.pyplot as plt
 import scipy.stats as scs
-
 from Ratio import *
 
 
@@ -245,14 +244,13 @@ def W_L_ratio_fit(z_cop,z_indep,waymarks=5,degrees=2):
 
     alphas = np.linspace(0, 1, waymarks)
     ratios_logistic = []
-    for i in tqdm(range(waymarks - 1)):
+    for i in (range(waymarks - 1)):
         alpha_i = alphas[i]
         alpha_i1 = alphas[i + 1]
         w_i = waymark(z_cop, z_indep, torch.tensor(alpha_i))
         w_i1 = waymark(z_cop, z_indep, torch.tensor(alpha_i1))
         model, poly = train_poly_classifier(w_i, w_i1, degree=degrees)
         ratios_logistic.append([model, poly])
-
     return ratios_logistic
 
 def L_W_ratio_compute(logistic_ratios,x,log_pdf=True):
