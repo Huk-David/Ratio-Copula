@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from pyhmc import hmc
 
 
 class Ratio(nn.Module):
@@ -42,7 +43,7 @@ class Ratio(nn.Module):
             logits = logits * self.c
 
         return logits
-    
+
 def loss_nce(r_p, r_q,p_size, q_size):
     v = q_size / p_size
     return (-(r_p /(v+r_p)).log()).mean() - v* ((v/(v+r_q)).log().mean()) 
