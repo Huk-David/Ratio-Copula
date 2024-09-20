@@ -124,7 +124,7 @@ for epoch in range(num_epochs):
     for inputs, labels in train_loader:
         optimizer.zero_grad()
         r_p = model(inputs).squeeze()  
-        r_q = model(torch.randn((3*64*inputs.shape[0],1,8,8))).squeeze()      
+        r_q = model(torch.randn((3*64*inputs.shape[0],1,8,8))).squeeze() # 3*64*inputs.shape[0] takes 36 mins to train on laptop  
         loss = loss_nce(r_p, r_q,inputs.shape[0], 10*inputs.shape[0])
         loss.backward()
         optimizer.step()
@@ -190,7 +190,7 @@ samples, log_pdf, x0_noises = sample_hmc(ratio_model=model,
                             num_runs_hmc=1000,
                             num_burnin=5000)
 
-# Save the samples and log probabilities
+# Save the samples 
 np.save('hmc_samples.npy', samples)
-np.save('hmc_log_pdf.npy', log_pdf)
-np.save('hmc_x0_noises.npy', x0_noises)
+
+LL = model(torch.tensor(X_test).reshape(-1,1,8,8).float()).log().mean()
