@@ -31,6 +31,8 @@ def loss_nce(r_p, r_q,p_size, q_size):
     v = q_size / p_size
     return (-(r_p /(v+r_p)).log()).mean() - v* ((v/(v+r_q)).log().mean()) 
 
+def W2(x,y):
+    return torch.sqrt(ot.emd2(torch.ones(x.shape[0])/x.shape[0], torch.ones(y.shape[0])/y.shape[0], ot.dist(x, y)))
 
 n_indep = 10 # number of independent samples for the NCE loss
 
@@ -276,6 +278,6 @@ for seed in [0,1,2,3,4,5,6,7,8,9]:
 
 
 
-    print((seed,train_ratio_model))
+    print((seed,'-------------'))
 
     print('Time:', time.time()-start)
