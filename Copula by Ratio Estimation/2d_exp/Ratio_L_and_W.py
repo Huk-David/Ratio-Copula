@@ -323,7 +323,7 @@ def W_Ratio_fit(z_cop,waymarks=5,ratio_args=None,return_waymark_datasets=False):
             if epoch % 100 == 0 and epoch > 0:
                 with torch.no_grad():
                     if epoch==500:# check the value and gradient of the normalising constant
-                        print(f'Epoch {epoch}, normalising constant {ratio.c.item()}', ratio.c.grad.item())
+                        print(f'Epoch {epoch}, normalising constant {ratio.c.item()}', loss.item())
                     #check if loss is not a number
                     if torch.isnan(loss):
                         print(r,u,'NAN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
