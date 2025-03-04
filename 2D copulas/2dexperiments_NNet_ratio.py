@@ -72,7 +72,7 @@ for r,run in (enumerate(sims_runs_all)):
         ratios.append(ratio)
 
         # Save the model parameters
-        model_path = f'model_parameters_NNet_ratio_25_runs_4copulas_2Dexperiment/NNet_ratio_run_{r}_cop_u_{u}.pt'
+        model_path = f'model_parameters_NNet_ratio_25_runs_4copulas_2Dexperiment/NNet_ratio_run_{r}_cop_u_{u}_ok.pt'
         torch.save(ratio.state_dict(), model_path)
 
         #print('run',r,'cop_u',u,'DONE',r_log)
